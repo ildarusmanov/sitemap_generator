@@ -128,27 +128,25 @@ class linkParser {
     }
     
     public function getExtension(){
-        
-        $parts = explode('/', $this->link);
-        
-        if( !is_array($parts) OR empty($parts[count($parts)]) ){
-            
-            return '';
-            
-        }
-        
 
-        $parts = explode('.', $parts[count($parts)-1]);
-        
-        if(is_array($parts)){
+            $ext = '';
             
-            return mb_strtolower( $parts[count($parts)-1], 'UTF-8' );
+            $parts = parse_url( $this->link );
+
+            $fname = isset( $parts['path'] ) ? $parts['path'] : '';
+
+            if( $fname == ''
+                    and mb_strrpos($fname, '.') != FALSE 
+                    and mb_strrpos($fname, '/') != FALSE 
+                    and mb_strrpos($fname, '.') > mb_strrpos($fname, '/') ){
+
+                    $ext = mb_substr($fname, mb_strrpos($fname, '.')+1);
+
+            }
             
-        }
-        
-        return '';
-        
+            return $ext;
     }
+    
     public function loadHtml(){
         $options = array(
                CURLOPT_RETURNTRANSFER => true,     // return web page
