@@ -5,18 +5,24 @@ sitemap.xml generator
 
 Setup
 =================
-1. Change config.php to your database settings
+1. Change config.php to your database settings and your web-site url
 
-2. create table `links` in your database with 3 fields: 
+2. Import dump.sql in PhpMyAdmin or create table `links` with SQL:
 
-id - int primary key auto_increment,
+CREATE TABLE IF NOT EXISTS `links` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `link` varchar(255) NOT NULL,
+  `level` varchar(5) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-link - varchar 255
+3. Start generator
 
-level - varchar 5
+in your browser http://sitename/generator_dir/index.php 
 
-3. setup your site name in index.php, replace 'http://hubnets.ru/' to your web-site name
+or with console: 
 
-4. Start generator in your browser or with console
+cd generator_dir
 
-5. enjoy!
+php index.php
+

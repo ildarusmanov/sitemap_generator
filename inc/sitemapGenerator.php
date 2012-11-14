@@ -99,8 +99,9 @@ class sitemapGenerator{
     public function saveToOneFile(){
         
         console::log('Writing sitemap.xml');
-        
-        $fp = fopen('sitemap.xml', 'w+');
+       
+
+        $fp = fopen(SITEMAP_DIR . 'sitemap.xml', 'w+');
         
         $str = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
                .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
@@ -142,7 +143,7 @@ class sitemapGenerator{
         
         console::log('Writing sitemap.xml');
         
-        $fp = fopen( 'sitemap.xml', 'w+');
+        $fp = fopen(SITEMAP_DIR . 'sitemap.xml', 'w+');
         
         $str = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
         .'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
@@ -160,7 +161,7 @@ class sitemapGenerator{
             
             console::log('Writing sitemap' . $i . '.xml');
             
-            $fpsm = fopen('sitemap' . $i . '.xml', 'w+');
+            $fpsm = fopen(SITEMAP_DIR . 'sitemap' . $i . '.xml', 'w+');
             
             $str = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
                    .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";

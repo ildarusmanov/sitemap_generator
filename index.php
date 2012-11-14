@@ -17,10 +17,11 @@ require_once 'inc/linksParser.php';
 
 require_once 'inc/console.php';
 
-$generator = new sitemapGenerator('http://hubnets.ru/');
+$generator = new sitemapGenerator( START_URL );
 
 $generator->loadDatabase();
 
 $generator->saveFiles();
+
 
 ?>

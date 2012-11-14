@@ -20,12 +20,14 @@ class linkParser {
     
     public function __construct( $link, $level = 1.0 ){
         
-        console::log('Begin processing link '. $link . ' with level ' . $level );
+        
         
         $this->link = $link;
  
         $this->level = $level < 0.1 ? 0.1 : $level;
- 
+
+ 	console::log('Begin processing link '. $this->link . ' with level ' . $this->level );
+
         if( !in_array( $this->getExtension(), $this->accept) ){
             
             console::log('ERR: Wrong extension: ' . $this->getExtension());
