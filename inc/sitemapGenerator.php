@@ -55,7 +55,13 @@ class sitemapGenerator{
     }
     
     private function getLink( $link ){
-        
+	
+	if( mb_substr( $link, mb_strlen($link) - 1, 1 ) == '/' ){
+
+		$link = mb_substr( $link, 0, mb_strlen($link) - 1 );	
+
+	}        
+
         if( mb_strstr( $this->entryPoint, $link, FALSE, 'UTF-8') !== FALSE )
         {
             
