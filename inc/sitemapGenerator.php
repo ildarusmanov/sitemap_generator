@@ -5,6 +5,7 @@ class sitemapGenerator{
     public $entryPoint = '';
     
     public $options = array( 'perPage' => 50000 );
+
     
     public function __construct( $entryPoint ){
         
@@ -24,8 +25,6 @@ class sitemapGenerator{
         
         $lprc = new linkParser( $link, $level);
         
-        $links = $lprc->getLinks();
-        
         if( $lprc->isExists() ){
             
             return;
@@ -33,6 +32,8 @@ class sitemapGenerator{
             
         }
         
+	$links = $lprc->getLinks();
+
         if( count($links) == 0 ){
             
             return;

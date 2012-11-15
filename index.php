@@ -7,6 +7,8 @@
  *  Creation date 14.11.2012
  */
 
+$START_TIME = microtime( true );
+
 require_once 'config.php';
 
 require_once 'inc/db.php';
@@ -22,6 +24,16 @@ $generator = new sitemapGenerator( START_URL );
 $generator->loadDatabase();
 
 $generator->saveFiles();
+
+$FINISH_TIME = microtime( true );
+
+$EXEC_TIME = $FINISH_TIME - $START_TIME;
+
+console::log('Started: ' . $START_TIME );
+
+console::log('Finished: ' . $FINISH_TIME );
+
+console::log('Execution time: ' . $EXEC_TIME );
 
 
 ?>

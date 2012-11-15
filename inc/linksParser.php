@@ -14,7 +14,7 @@ class linkParser {
     
     public $level = 1.0;
     
-    public $accept = array('html','php','');
+    public $accept = array('html','php');
     
     public $exists = 'undefined';
     
@@ -28,7 +28,7 @@ class linkParser {
 
  	console::log('Begin processing link '. $this->link . ' with level ' . $this->level );
 
-        if( !in_array( $this->getExtension(), $this->accept) ){
+        if( $this->getExtension() != '' AND !in_array( $this->getExtension(), $this->accept) ){
             
             console::log('ERR: Wrong extension: ' . $this->getExtension());
             
@@ -135,10 +135,11 @@ class linkParser {
 
             $fname = isset( $parts['path'] ) ? $parts['path'] : '';
 
-            if( $fname == ''
+            if(     $fname != ''
                     and mb_strrpos($fname, '.') != FALSE 
                     and mb_strrpos($fname, '/') != FALSE 
-                    and mb_strrpos($fname, '.') > mb_strrpos($fname, '/') ){
+                    and mb_strrpos($fname, '.') > mb_strrpos($fname, '/') 
+		){
 
                     $ext = mb_substr($fname, mb_strrpos($fname, '.')+1);
 
