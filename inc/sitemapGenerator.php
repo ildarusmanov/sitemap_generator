@@ -1,36 +1,67 @@
 <?php
 
-class sitemapGenerator{
-    
+class sitemapGenerator{    
+
     public $entryPoint = '';
     
     public $options = array( 'perPage' => 50000 );
 
-    
+    private $linksToParse = array();
+
     public function __construct( $entryPoint ){
         
         $this->entryPoint = $entryPoint;
+
+	mysql_query('TRUNCATE `links`;');
+
+	 $this->loadLink( $this->getLink( $this->entryPoint ), 1.0 );
+
+	$this->loadDatabase( 0.9 );
         
     }
     
-    public function loadDatabase(){
-        
-        mysql_query('TRUNCATE `links`;');
-        
-        $this->loadLink( $this->entryPoint, 1.0 );
+    public function loadDatabase( $level ){
+
+	if( count( $this->linksToParse ) > 0 ) {
+
+		$links = $this->linksToParse;
+
+		$this->linksToParse = array();
+
+		for( $i=0; $i< count($links); $i++ ){
+
+			$this->loadLink( $links[$i], $level );
+		
+		}
+			
+	}
+
+	if( count( $this->linksToParse ) > 0 ) {
+
+		$this->loadDatabase( $level - 0.1  );
+
+	}
         
     }
+    
     
     private function loadLink( $link, $level ){
         
         $lprc = new linkParser( $link, $level);
         
-        if( $lprc->isExists() ){
+        if( $lprc->error != 0 ){
             
             return;
         
             
         }
+
+        if( $lprc->isExists() ){
+            
+            return;
+        
+            
+        }    
         
 	$links = $lprc->getLinks();
 
@@ -44,35 +75,46 @@ class sitemapGenerator{
         
         for( $i=0; $i< count($links); $i++ ){
             
-            $link = $this->getLink( $links[$i] );
-            
+            $link = $this->getLink( $links[$i], $lprc->link );
+
             if( in_array( $link, array('#','/') ) ) continue;
-            
-            $this->loadLink( $link, $level );
+
+	    $this->linksToParse[] = $link;
+
+            //$this->loadLink( $link, $level );
             
         }
         
     }
     
-    private function getLink( $link ){
-	
+    private function getLink( $link, $currentLink = '' ){
+
+
 	if( mb_substr( $link, mb_strlen($link) - 1, 1 ) == '/' ){
 
 		$link = mb_substr( $link, 0, mb_strlen($link) - 1 );	
 
 	}        
 
-        if( mb_strstr( $this->entryPoint, $link, FALSE, 'UTF-8') !== FALSE )
+	if( $link == '' ){
+
+		return 	mb_substr( $this->entryPoint, 0, mb_strlen($link) - 1 );
+		
+	}
+
+
+        if( mb_strlen($link) > 0 AND mb_strstr( $this->entryPoint, $link, FALSE, 'UTF-8') !== FALSE )
         {
             
             return $link;
             
         }
-        
-        
-        if( $link[0] != '/' ){
+
+        if( mb_substr($link, 0, 1) != '/' ){
             
-            if( mb_strstr( $this->entryPoint, 'http://', FALSE, 'UTF-8') !== FALSE ){
+            if( mb_strstr( $link, '#', FALSE, 'UTF-8') !== FALSE 
+		OR mb_strstr( $link, 'http://', FALSE, 'UTF-8') !== FALSE 
+	    ){
             
                 return '#';
             

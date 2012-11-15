@@ -12,11 +12,15 @@
  */
 class linkParser {
     
+    public $link;
+
     public $level = 1.0;
     
     public $accept = array('html','php');
     
     public $exists = 'undefined';
+
+    public $error = 0;
     
     public function __construct( $link, $level = 1.0 ){
         
@@ -31,7 +35,9 @@ class linkParser {
         if( $this->getExtension() != '' AND !in_array( $this->getExtension(), $this->accept) ){
             
             console::log('ERR: Wrong extension: ' . $this->getExtension());
-            
+
+            $this->error = 1;            
+
             return;
           
         }
@@ -39,7 +45,9 @@ class linkParser {
         if( $this->isExists() ){
             
             console::log('ERR: Already exists!');
-            
+ 
+            $this->error = 1;   
+       
             return;
             
         }
@@ -49,7 +57,9 @@ class linkParser {
         if( $html == null ){
             
             console::log('ERR: Load html error!');
-            
+ 
+            $this->error = 1;   
+          
             return;
             
         }
