@@ -13,6 +13,8 @@ require_once 'config.php';
 
 require_once 'inc/db.php';
 
+require_once 'inc/init_db.php';
+
 require_once 'inc/sitemapGenerator.php';
 
 require_once 'inc/linksParser.php';
