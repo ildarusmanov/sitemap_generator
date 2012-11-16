@@ -29,19 +29,21 @@ class sitemapGenerator{
 
 			if( mysql_num_rows( $r ) > 0 ){
 
-				while( $link = mysql_fetch_array( $r ) ){
+				while( $qlink = mysql_fetch_array( $r ) ){
+					
+					mysql_query('DELETE FROM `queue` WHERE `id` = "' . $qlink['id'] . '";');
 
-					$this->loadLink( urldecode( $link['link'] ), $level );
+					$this->loadLink( urldecode( $qlink['link'] ), $level );
 		
 				}
+				
+				
 
 			}
 
 	}
 
-	$this->clearQueue();
-			
-
+	
 
 	if( $this->haveQueue() ) {
 
@@ -143,6 +145,10 @@ class sitemapGenerator{
 
     private function getLink( $link, $currentLink = '' ){
 
+        if( mb_strstr( $link, '#', FALSE, 'UTF-8') !== FALSE ){
+
+		$link = mb_substr( $link, mb_strstr( $link, '#', FALSE, 'UTF-8') - 1 );
+	}
 
 	if( mb_substr( $link, mb_strlen($link) - 1, 1 ) == '/' ){
 
@@ -166,9 +172,8 @@ class sitemapGenerator{
 
         if( mb_substr($link, 0, 1) != '/' ){
             
-            if( mb_strstr( $link, '#', FALSE, 'UTF-8') !== FALSE 
-		OR mb_strstr( $link, 'http://', FALSE, 'UTF-8') !== FALSE 
-	    ){
+ 
+            if( mb_strstr( $link, '://', FALSE, 'UTF-8') !== FALSE ){
             
                 return '#';
             
@@ -185,7 +190,7 @@ class sitemapGenerator{
         
         console::log('Begin files generation!');
         
-        $r = mysql_query('SELECT count(`id`) FROM `links`;');
+        $r = mysql_query('SELECT count(*) FROM `links`;');
         
         $count = mysql_fetch_array( $r );
         
