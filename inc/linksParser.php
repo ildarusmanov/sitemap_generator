@@ -71,13 +71,18 @@ class linkParser {
     public function save(){
         
         $sql = 'INSERT INTO `links` SET '
-                .'`link` = "' . $this->link . '", `level` ="' . $this->level . '";';
+                .'`link` = "' . urlencode( $this->link ) 
+		. '", `level` ="' . $this->level . '";';
     
         if( mysql_query( $sql ) ){
         
-            return console::log('Saved!');
+            	return console::log('Saved!');
             
-        }
+        }else{
+
+		console::log('ERR: MySQL: ' . mysql_error() );
+
+	}
         
         console::log('ERR: Can`t save to database!');
         
@@ -93,25 +98,27 @@ class linkParser {
         
         $this->exists = FALSE;
         
-        $sql = 'SELECT * FROM `links` WHERE `link` LIKE "' . $this->link . '"';
+        $sql = 'SELECT * FROM `links` WHERE `link` LIKE "' . urlencode( $this->link ) . '"';
         
-        $r = mysql_query( $sql );
+        if($r = mysql_query( $sql ) AND mysql_error() == '' ){
         
-        
-        
-        if( mysql_num_rows( $r ) > 0 ){
-            
-            $data = mysql_fetch_array($r);
-            
-            if( $data['level'] < $this->level ){
-                
-                $this->updatelevel( $this->level );
-            }
-            
-            $this->exists = TRUE;
-            
-        }
-        
+		if( mysql_num_rows( $r ) > 0 ){
+		    
+		    $data = mysql_fetch_array($r);
+		    
+		    if( $data['level'] < $this->level ){
+		        
+		        $this->updatelevel( $this->level );
+		    }
+		    
+		    $this->exists = TRUE;
+		    
+		}
+        }else{
+	
+		console::log('ERR: MySQL: ' . mysql_error() );
+	}
+
         return $this->exists;
         
     }

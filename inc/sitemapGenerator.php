@@ -6,44 +6,50 @@ class sitemapGenerator{
     
     public $options = array( 'perPage' => 50000 );
 
-    private $linksToParse = array();
 
     public function __construct( $entryPoint ){
         
         $this->entryPoint = $entryPoint;
 
-	mysql_query('TRUNCATE `links`;');
+	$this->clearLinks();
+	
+	$this->clearQueue();
 
-	 $this->loadLink( $this->getLink( $this->entryPoint ), 1.0 );
+	$this->loadLink( $this->getLink( $this->entryPoint ), 1.0 );
 
 	$this->loadDatabase( 0.9 );
+
+	$this->saveFiles();
         
     }
     
     public function loadDatabase( $level ){
 
-	if( count( $this->linksToParse ) > 0 ) {
+	if( $r = mysql_query('SELECT * FROM `queue`;') ){
 
-		$links = $this->linksToParse;
+			if( mysql_num_rows( $r ) > 0 ){
 
-		$this->linksToParse = array();
+				while( $link = mysql_fetch_array( $r ) ){
 
-		for( $i=0; $i< count($links); $i++ ){
-
-			$this->loadLink( $links[$i], $level );
+					$this->loadLink( urldecode( $link['link'] ), $level );
 		
-		}
-			
+				}
+
+			}
+
 	}
 
-	if( count( $this->linksToParse ) > 0 ) {
+	$this->clearQueue();
+			
+
+
+	if( $this->haveQueue() ) {
 
 		$this->loadDatabase( $level - 0.1  );
 
 	}
         
     }
-    
     
     private function loadLink( $link, $level ){
         
@@ -79,14 +85,62 @@ class sitemapGenerator{
 
             if( in_array( $link, array('#','/') ) ) continue;
 
-	    $this->linksToParse[] = $link;
-
-            //$this->loadLink( $link, $level );
+	    $this->addQueue( $link );
             
         }
         
     }
+
+    private function addQueue( $link ){
+
+	$sql = 'SELECT `id` FROM `queue` WHERE `link` = "' . urlencode( $link ) . '";';	
+	
+	$r = mysql_query( $sql );
+	
+	if( mysql_error() != '' OR mysql_num_rows( $r ) > 0 ){
+
+		return;
+
+	}
+	
+        $sql = 'INSERT INTO `queue` SET '
+                .'`link` = "' . urlencode( $link ) 
+		. '";';
     
+        mysql_query( $sql );
+        
+            
+        if( mysql_error() != '' ){
+
+		console::log('ERR: MySQL: ' . mysql_error() );
+
+	}
+
+    }
+
+    private function clearQueue(){
+
+	mysql_query('TRUNCATE `queue`;');
+
+    }
+
+    private function clearLinks(){
+
+	mysql_query('TRUNCATE `links`;');
+
+    }
+
+    private function haveQueue(){
+
+	$r = mysql_query('SELECT count(*) as `count` FROM `queue`;');
+	
+	$count = mysql_fetch_array( $r );
+
+	return $count['count'] > 0 ? TRUE : FALSE ;
+	
+	
+    }
+
     private function getLink( $link, $currentLink = '' ){
 
 
@@ -160,7 +214,9 @@ class sitemapGenerator{
         $r = mysql_query('SELECT * FROM `links`;');
         
         while( $link = mysql_fetch_array( $r ) ){
-            
+
+            $link['link'] = urldecode( $link['link'] );
+
             console::log('Writing ' . $link['link'] . ' ' . $link['level'] );
             
             $str = "\t" . '<url>' . "\n" 
@@ -222,6 +278,8 @@ class sitemapGenerator{
             $r = mysql_query( $sql );
         
             while( $link = mysql_fetch_array($r) ){
+		
+		$link['link'] = urldecode( $link['link'] );
                 
                 console::log('Writing ' . $link['link'] . ' ' . $link['level'] );
                 

@@ -21,10 +21,6 @@ require_once 'inc/console.php';
 
 $generator = new sitemapGenerator( START_URL );
 
-$generator->loadDatabase();
-
-$generator->saveFiles();
-
 $FINISH_TIME = microtime( true );
 
 $EXEC_TIME = $FINISH_TIME - $START_TIME;
